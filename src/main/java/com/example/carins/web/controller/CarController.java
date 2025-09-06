@@ -1,4 +1,4 @@
-package com.example.carins.web;
+package com.example.carins.web.controller;
 
 import com.example.carins.model.Car;
 import com.example.carins.service.CarService;
