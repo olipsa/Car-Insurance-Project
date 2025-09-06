@@ -3,6 +3,8 @@ package com.example.carins.web.controller;
 import com.example.carins.model.Car;
 import com.example.carins.service.CarService;
 import com.example.carins.web.dto.CarDto;
+import com.example.carins.web.dto.CarHistoryDto;
+import com.example.carins.web.dto.CarHistoryEventType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +32,11 @@ public class CarController {
         LocalDate d = LocalDate.parse(date);
         boolean valid = service.isInsuranceValid(carId, d);
         return ResponseEntity.ok(new InsuranceValidityResponse(carId, d.toString(), valid));
+    }
+
+    @GetMapping("/cars/{carId}/history")
+    public List<CarHistoryDto> getCarHistory(@PathVariable Long carId){
+        return service.getCarHistory(carId);
     }
 
     private CarDto toDto(Car c) {
