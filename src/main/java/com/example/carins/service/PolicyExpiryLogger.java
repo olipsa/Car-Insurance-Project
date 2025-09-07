@@ -29,7 +29,7 @@ public class PolicyExpiryLogger {
     public void getAlreadyExpiredPolicies() {
         LocalDate today = LocalDate.now();
         List<InsurancePolicy> alreadyExpired = policyRepository.findAll()
-                .stream().filter(p -> p.getEndDate() !=null && p.getEndDate().isBefore(today))
+                .stream().filter(p -> p.getEndDate() !=null && p.getEndDate().isBefore(today.minusDays(1)))
                 .toList();
         alreadyExpired.forEach(p -> loggedPolicyIds.add(p.getId()));
     }
