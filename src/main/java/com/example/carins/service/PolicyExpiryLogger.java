@@ -35,7 +35,7 @@ public class PolicyExpiryLogger {
     }
 
     @Scheduled(cron = "*/30 * * * * *")
-    public void lofRecentlyExpiredPolicies(){
+    public void logRecentlyExpiredPolicies(){
         LocalDate today = LocalDate.now();
         LocalDate expiredOn = today.minusDays(1);
         LocalDateTime midnightToday = today.atStartOfDay();
