@@ -26,10 +26,7 @@ public class InsurancePolicyController {
 
     @PutMapping("/policies/{id}")
     public InsurancePolicyDto updatePolicy(@PathVariable("id")long id, @Valid @RequestBody InsurancePolicyDto policyDto) throws BadRequestException {
-        if(id != policyDto.id()){
-            throw new BadRequestException("Policy id does not match path variable");
-        }
-        return policyService.updatePolicy(policyDto);
+        return policyService.updatePolicy(id, policyDto);
     }
 
 }

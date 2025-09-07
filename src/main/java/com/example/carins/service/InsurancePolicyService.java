@@ -24,7 +24,6 @@ public class InsurancePolicyService {
 
     @Transactional
     public InsurancePolicyDto createPolicy(InsurancePolicyDto policyDto) {
-        // TODO handle case when policy ID is provided => return 400 Bad Request
         Car car = carRepository.findById(policyDto.carId())
                 .orElseThrow(() -> new CarNotFoundException(policyDto.carId()));
 
@@ -33,7 +32,6 @@ public class InsurancePolicyService {
         policy = policyRepository.save(policy); // id auto-generated
 
         return new InsurancePolicyDto(
-                policy.getId(),
                 policy.getCar().getId(),
                 policy.getProvider(),
                 policy.getStartDate(),
@@ -41,12 +39,12 @@ public class InsurancePolicyService {
     }
 
     @Transactional
-    public InsurancePolicyDto updatePolicy(InsurancePolicyDto policyDto) {
-        InsurancePolicy policy = policyRepository.findById(policyDto.id())
-                .orElseThrow(() -> new PolicyNotFoundException(policyDto.id()
-                ));
+    public InsurancePolicyDto updatePolicy(long id, InsurancePolicyDto policyDto) {
+        InsurancePolicy policy = policyRepository.findById(id)
+                .orElseThrow(() -> new PolicyNotFoundException(id));
 
         if (!policy.getCar().getId().equals(policyDto.carId())) {
+            // provided car ID does not match with the one in the policy
             Car car = carRepository.findById(policyDto.carId())
                     .orElseThrow(() ->  new CarNotFoundException(policyDto.carId()));
             policy.setCar(car);
@@ -60,7 +58,6 @@ public class InsurancePolicyService {
 
 
         return new InsurancePolicyDto(
-                policy.getId(),
                 policy.getCar().getId(),
                 policy.getProvider(),
                 policy.getStartDate(),
