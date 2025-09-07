@@ -49,6 +49,18 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(PolicyNotFoundException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleCarNotFound(PolicyNotFoundException ex, HttpServletRequest request) {
+        return new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+    }
+
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseBody

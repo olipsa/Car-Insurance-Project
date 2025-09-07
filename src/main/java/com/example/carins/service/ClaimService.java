@@ -5,7 +5,7 @@ import com.example.carins.model.Claim;
 import com.example.carins.repo.CarRepository;
 import com.example.carins.repo.ClaimRepository;
 import com.example.carins.web.dto.ClaimCreateRequestDto;
-import com.example.carins.web.dto.ClaimDto;
+import com.example.carins.web.dto.ClaimResponseDto;
 import com.example.carins.web.exception.CarNotFoundException;
 import com.example.carins.web.exception.InvalidDateException;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class ClaimService {
     }
 
 
-    public ClaimDto createClaim(Long carId, ClaimCreateRequestDto claimReqDto) {
+    public ClaimResponseDto createClaim(Long carId, ClaimCreateRequestDto claimReqDto) {
         Car car = carRepository.findById(carId)
                 .orElseThrow(() -> new CarNotFoundException(carId));
 
@@ -37,6 +37,6 @@ public class ClaimService {
         Claim claim = new Claim(car, claimDate, claimReqDto.description(), claimReqDto.amount());
 
         claim = claimRepository.save(claim);
-        return new ClaimDto(claim.getId(),claim.getCar().getId(),claim.getClaimDate(),claim.getDescription(),claim.getAmount());
+        return new ClaimResponseDto(claim.getId(),claim.getCar().getId(),claim.getClaimDate(),claim.getDescription(),claim.getAmount());
     }
 }

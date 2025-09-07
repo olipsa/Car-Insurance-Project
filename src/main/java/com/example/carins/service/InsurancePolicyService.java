@@ -5,6 +5,7 @@ import com.example.carins.model.InsurancePolicy;
 import com.example.carins.repo.CarRepository;
 import com.example.carins.repo.InsurancePolicyRepository;
 import com.example.carins.web.dto.InsurancePolicyDto;
+import com.example.carins.web.dto.InsurancePolicyResponseDto;
 import com.example.carins.web.exception.CarNotFoundException;
 import com.example.carins.web.exception.PolicyNotFoundException;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class InsurancePolicyService {
     }
 
     @Transactional
-    public InsurancePolicyDto createPolicy(InsurancePolicyDto policyDto) {
+    public InsurancePolicyResponseDto createPolicy(InsurancePolicyDto policyDto) {
         Car car = carRepository.findById(policyDto.carId())
                 .orElseThrow(() -> new CarNotFoundException(policyDto.carId()));
 
@@ -31,7 +32,8 @@ public class InsurancePolicyService {
 
         policy = policyRepository.save(policy); // id auto-generated
 
-        return new InsurancePolicyDto(
+        return new InsurancePolicyResponseDto(
+                policy.getId(),
                 policy.getCar().getId(),
                 policy.getProvider(),
                 policy.getStartDate(),
@@ -39,7 +41,7 @@ public class InsurancePolicyService {
     }
 
     @Transactional
-    public InsurancePolicyDto updatePolicy(long id, InsurancePolicyDto policyDto) {
+    public InsurancePolicyResponseDto updatePolicy(long id, InsurancePolicyDto policyDto) {
         InsurancePolicy policy = policyRepository.findById(id)
                 .orElseThrow(() -> new PolicyNotFoundException(id));
 
@@ -57,7 +59,8 @@ public class InsurancePolicyService {
         policy = policyRepository.save(policy);
 
 
-        return new InsurancePolicyDto(
+        return new InsurancePolicyResponseDto(
+                policy.getId(),
                 policy.getCar().getId(),
                 policy.getProvider(),
                 policy.getStartDate(),
