@@ -327,6 +327,65 @@ class CarInsuranceApplicationTests {
                 .andExpect(jsonPath("$.message", Matchers.containsStringIgnoringCase("does not exist")));
     }
 
+    // Tests for claims
+    @Test
+    void createClaim_withValidRequest_returnsCreated() throws Exception {
+        Map<String, Object> claimMap = new HashMap<>();
+        claimMap.put("claimDate", "2024-06-01");
+        claimMap.put("description", "Brake not working");
+        claimMap.put("amount", 500.0);
+
+        mvc.perform(post("/api/cars/"+2L+"/claims")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(claimMap)))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    void createClaim_withInvalidCarId_returnsNotFound() throws Exception {
+        Map<String, Object> claimMap = new HashMap<>();
+        claimMap.put("claimDate", "2024-06-01");
+        claimMap.put("description", "Brake not working");
+        claimMap.put("amount", 500.0);
+
+        mvc.perform(post("/api/cars/"+100L+"/claims")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(claimMap)))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message", Matchers.containsStringIgnoringCase("does not exist")));
+    }
+
+    @Test
+    void createClaim_withInvalidDate_returnsBadRequest() throws Exception {
+        Map<String, Object> claimMap = new HashMap<>();
+        claimMap.put("claimDate", "20240-99-AA");
+        claimMap.put("description", "Brake not working");
+        claimMap.put("amount", 500.0);
+
+        mvc.perform(post("/api/cars/"+1L+"/claims")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(claimMap)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message", Matchers.containsStringIgnoringCase("invalid date")));
+    }
+
+    @Test
+    void createClaim_withInvalidAmount_returnsBadRequest() throws Exception {
+        Map<String, Object> claimMap = new HashMap<>();
+        claimMap.put("claimDate", "2024-06-01");
+        claimMap.put("description", "Brake not working");
+        claimMap.put("amount", -1.0);
+
+        mvc.perform(post("/api/cars/"+1L+"/claims")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(claimMap)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message", Matchers.containsStringIgnoringCase("amount must be positive")));
+    }
+
     // Tests for CarHistory
     @Test
     void carHistory_includesClaimAndPolicies_sortedByDate(){
