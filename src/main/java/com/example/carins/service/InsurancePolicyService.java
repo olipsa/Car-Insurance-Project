@@ -7,6 +7,7 @@ import com.example.carins.repo.InsurancePolicyRepository;
 import com.example.carins.web.dto.InsurancePolicyDto;
 import com.example.carins.web.dto.InsurancePolicyResponseDto;
 import com.example.carins.web.exception.CarNotFoundException;
+import com.example.carins.web.exception.InvalidDateException;
 import com.example.carins.web.exception.PolicyNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +30,11 @@ public class InsurancePolicyService {
     public InsurancePolicyResponseDto createPolicy(InsurancePolicyDto policyDto) {
         Car car = carRepository.findById(policyDto.carId())
                 .orElseThrow(() -> new CarNotFoundException(policyDto.carId()));
-        // TODO validate date - startDate <= endDate
+
+        if(policyDto.startDate().isAfter(policyDto.endDate())){
+            throw new InvalidDateException("Start date cannot be after end date. ",
+                    "Provided start date ("+policyDto.startDate().toString() + ") is after provided end date (" + policyDto.endDate().toString()+")");
+        }
 
         InsurancePolicy policy = new InsurancePolicy(car, policyDto.provider(), policyDto.startDate(), policyDto.endDate());
 
@@ -55,7 +60,10 @@ public class InsurancePolicyService {
             policy.setCar(car);
         }
 
-        // TODO validate date - startDate <= endDate
+        if(policyDto.startDate().isAfter(policyDto.endDate())){
+            throw new InvalidDateException("Start date cannot be after end date. ",
+                    "Provided start date ("+policyDto.startDate().toString() + ") is after provided end date (" + policyDto.endDate().toString()+")");
+        }
 
         boolean endDateChanged = !policy.getEndDate().equals(policyDto.endDate());
 
