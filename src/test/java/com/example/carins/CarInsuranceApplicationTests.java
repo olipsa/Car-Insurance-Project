@@ -1,5 +1,6 @@
 package com.example.carins;
 
+import com.example.carins.repo.OwnerRepository;
 import com.example.carins.service.CarService;
 import com.example.carins.web.dto.CarHistoryEventType;
 import com.example.carins.web.exception.CarNotFoundException;
@@ -35,6 +36,9 @@ class CarInsuranceApplicationTests {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private OwnerRepository ownerRepository;
 
 
     // Tests for insurance validity
@@ -357,6 +361,31 @@ class CarInsuranceApplicationTests {
     @Test
     void carHistory_whenCarMissing_throwsException() {
         assertThrows(CarNotFoundException.class, () -> service.getCarHistory(999L));
+    }
+
+    // Tests for Car
+    @Test
+    void createCar_duplicateVin_returnsBadRequest() throws Exception {
+        Map<String, Object> carMap = new HashMap<>();
+        carMap.put("vin", "VIN123454321");
+        carMap.put("make", "Ford");
+        carMap.put("model", "Focus");
+        carMap.put("yearOfManufacture", 2021);
+        carMap.put("ownerId", 1L);
+
+        // First POST should succeed
+        mvc.perform(post("/api/cars")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(carMap)))
+                .andExpect(status().isCreated());
+
+        // Second POST with same VIN should fail (unique check)
+        mvc.perform(post("/api/cars")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(carMap)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message", Matchers.containsStringIgnoringCase("Invalid VIN provided")));
     }
 
     // Tests for Scheduler
