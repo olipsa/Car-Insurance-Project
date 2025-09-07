@@ -1,6 +1,5 @@
 package com.example.carins;
 
-import com.example.carins.repo.OwnerRepository;
 import com.example.carins.service.CarService;
 import com.example.carins.web.dto.CarHistoryEventType;
 import com.example.carins.web.exception.CarNotFoundException;
@@ -36,10 +35,6 @@ class CarInsuranceApplicationTests {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private OwnerRepository ownerRepository;
-
 
     // Tests for insurance validity
     @Test
@@ -332,10 +327,6 @@ class CarInsuranceApplicationTests {
                 .andExpect(jsonPath("$.message", Matchers.containsStringIgnoringCase("does not exist")));
     }
 
-    // Tests for Claims
-    // TODO Add tests
-
-
     // Tests for CarHistory
     @Test
     void carHistory_includesClaimAndPolicies_sortedByDate(){
@@ -387,7 +378,4 @@ class CarInsuranceApplicationTests {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.message", Matchers.containsStringIgnoringCase("Invalid VIN provided")));
     }
-
-    // Tests for Scheduler
-    // TODO Add tests
 }
