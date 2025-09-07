@@ -7,6 +7,7 @@ import com.example.carins.repo.ClaimRepository;
 import com.example.carins.web.dto.ClaimCreateRequestDto;
 import com.example.carins.web.dto.ClaimDto;
 import com.example.carins.web.exception.CarNotFoundException;
+import com.example.carins.web.exception.InvalidDateException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -27,11 +28,10 @@ public class ClaimService {
                 .orElseThrow(() -> new CarNotFoundException(carId));
 
         LocalDate claimDate;
-
         try {
             claimDate = LocalDate.parse(claimReqDto.claimDate());
         } catch (Exception ex) {
-            throw new IllegalArgumentException("Invalid claimDate: must be ISO format (YYYY-MM-DD)");
+            throw new InvalidDateException(claimReqDto.claimDate());
         }
 
         Claim claim = new Claim(car, claimDate, claimReqDto.description(), claimReqDto.amount());

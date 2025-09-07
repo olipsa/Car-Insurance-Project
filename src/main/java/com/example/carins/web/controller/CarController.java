@@ -4,7 +4,7 @@ import com.example.carins.model.Car;
 import com.example.carins.service.CarService;
 import com.example.carins.web.dto.CarDto;
 import com.example.carins.web.dto.CarHistoryDto;
-import com.example.carins.web.dto.CarHistoryEventType;
+import com.example.carins.web.exception.InvalidDateException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,10 +28,20 @@ public class CarController {
 
     @GetMapping("/cars/{carId}/insurance-valid")
     public ResponseEntity<?> isInsuranceValid(@PathVariable Long carId, @RequestParam String date) {
-        // TODO: validate date format and handle errors consistently
-        LocalDate d = LocalDate.parse(date);
-        boolean valid = service.isInsuranceValid(carId, d);
-        return ResponseEntity.ok(new InsuranceValidityResponse(carId, d.toString(), valid));
+        LocalDate reqDate;
+
+        try {
+            reqDate = LocalDate.parse(date);
+        } catch (Exception ex) {
+            throw new InvalidDateException(date);
+        }
+
+        if (reqDate.getYear() < 1900 || reqDate.getYear() > 2100) {
+            throw new InvalidDateException("Impossible date provided: ", date);
+        }
+
+        boolean valid = service.isInsuranceValid(carId, reqDate);
+        return ResponseEntity.ok(new InsuranceValidityResponse(carId, reqDate.toString(), valid));
     }
 
     @GetMapping("/cars/{carId}/history")
