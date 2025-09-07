@@ -2,9 +2,10 @@ package com.example.carins.web.controller;
 
 import com.example.carins.model.Car;
 import com.example.carins.service.CarService;
-import com.example.carins.web.dto.CarDto;
-import com.example.carins.web.dto.CarHistoryDto;
+import com.example.carins.web.dto.*;
 import com.example.carins.web.exception.InvalidDateException;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +48,13 @@ public class CarController {
     @GetMapping("/cars/{carId}/history")
     public List<CarHistoryDto> getCarHistory(@PathVariable Long carId){
         return service.getCarHistory(carId);
+    }
+
+    @PostMapping("/cars")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CarDto createCar(@Valid @RequestBody CarCreateRequestDto car){
+        return service.createCar(car);
+
     }
 
     private CarDto toDto(Car c) {

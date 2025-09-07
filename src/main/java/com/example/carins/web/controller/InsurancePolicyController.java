@@ -2,7 +2,7 @@ package com.example.carins.web.controller;
 
 import com.example.carins.service.InsurancePolicyService;
 
-import com.example.carins.web.dto.InsurancePolicyDto;
+import com.example.carins.web.dto.InsurancePolicyRequestDto;
 import com.example.carins.web.dto.InsurancePolicyResponseDto;
 import com.example.carins.web.exception.BadRequestException;
 import jakarta.validation.Valid;
@@ -21,12 +21,12 @@ public class InsurancePolicyController {
 
     @PostMapping("/policies")
     @ResponseStatus(HttpStatus.CREATED)
-    public InsurancePolicyResponseDto createPolicy(@Valid @RequestBody InsurancePolicyDto policyDto) {
+    public InsurancePolicyResponseDto createPolicy(@Valid @RequestBody InsurancePolicyRequestDto policyDto) {
         return policyService.createPolicy(policyDto);
     }
 
     @PutMapping("/policies/{id}")
-    public InsurancePolicyResponseDto updatePolicy(@PathVariable("id")long id, @Valid @RequestBody InsurancePolicyDto policyDto) throws BadRequestException {
+    public InsurancePolicyResponseDto updatePolicy(@PathVariable("id")long id, @Valid @RequestBody InsurancePolicyRequestDto policyDto) throws BadRequestException {
         return policyService.updatePolicy(id, policyDto);
     }
 

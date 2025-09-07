@@ -1,13 +1,17 @@
 package com.example.carins.service;
 
 import com.example.carins.model.Car;
+import com.example.carins.model.Owner;
 import com.example.carins.repo.CarRepository;
 import com.example.carins.repo.ClaimRepository;
 import com.example.carins.repo.InsurancePolicyRepository;
-import com.example.carins.web.dto.CarHistoryDto;
-import com.example.carins.web.dto.CarHistoryEventType;
+import com.example.carins.repo.OwnerRepository;
+import com.example.carins.web.dto.*;
 import com.example.carins.web.exception.CarNotFoundException;
+import com.example.carins.web.exception.InvalidCarVinException;
+import com.example.carins.web.exception.OwnerNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -20,11 +24,13 @@ public class CarService {
     private final CarRepository carRepository;
     private final InsurancePolicyRepository policyRepository;
     private final ClaimRepository claimRepository;
+    private final OwnerRepository ownerRepository;
 
-    public CarService(CarRepository carRepository, InsurancePolicyRepository policyRepository, ClaimRepository claimRepository) {
+    public CarService(CarRepository carRepository, InsurancePolicyRepository policyRepository, ClaimRepository claimRepository, OwnerRepository ownerRepository) {
         this.carRepository = carRepository;
         this.policyRepository = policyRepository;
         this.claimRepository = claimRepository;
+        this.ownerRepository = ownerRepository;
     }
 
     public List<Car> listCars() {
@@ -53,5 +59,28 @@ public class CarService {
         return Stream.concat(claims, policies)
                 .sorted(Comparator.comparing((CarHistoryDto::date))).toList();
 
+    }
+
+    @Transactional
+    public CarDto createCar(CarCreateRequestDto car) {
+        Owner owner = ownerRepository.findById(car.ownerId())
+                .orElseThrow(() -> new OwnerNotFoundException(car.ownerId()));
+
+        carRepository.findByVin(car.vin()).ifPresent(c -> {
+            throw new InvalidCarVinException(car.vin());});
+
+        Car newCar = new Car(car.vin(),car.make(),car.model(),car.yearOfManufacture(),owner);
+
+        newCar = carRepository.save(newCar); // id auto-generated
+
+        return new CarDto(
+                newCar.getId(),
+                newCar.getVin(),
+                newCar.getMake(),
+                newCar.getModel(),
+                newCar.getYearOfManufacture(),
+                newCar.getOwner().getId(),
+                newCar.getOwner().getName(),
+                newCar.getOwner().getEmail());
     }
 }

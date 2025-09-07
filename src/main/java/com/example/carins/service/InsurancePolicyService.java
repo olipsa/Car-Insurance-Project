@@ -4,7 +4,7 @@ import com.example.carins.model.Car;
 import com.example.carins.model.InsurancePolicy;
 import com.example.carins.repo.CarRepository;
 import com.example.carins.repo.InsurancePolicyRepository;
-import com.example.carins.web.dto.InsurancePolicyDto;
+import com.example.carins.web.dto.InsurancePolicyRequestDto;
 import com.example.carins.web.dto.InsurancePolicyResponseDto;
 import com.example.carins.web.exception.CarNotFoundException;
 import com.example.carins.web.exception.InvalidDateException;
@@ -27,7 +27,7 @@ public class InsurancePolicyService {
     }
 
     @Transactional
-    public InsurancePolicyResponseDto createPolicy(InsurancePolicyDto policyDto) {
+    public InsurancePolicyResponseDto createPolicy(InsurancePolicyRequestDto policyDto) {
         Car car = carRepository.findById(policyDto.carId())
                 .orElseThrow(() -> new CarNotFoundException(policyDto.carId()));
 
@@ -49,7 +49,7 @@ public class InsurancePolicyService {
     }
 
     @Transactional
-    public InsurancePolicyResponseDto updatePolicy(long id, InsurancePolicyDto policyDto) {
+    public InsurancePolicyResponseDto updatePolicy(long id, InsurancePolicyRequestDto policyDto) {
         InsurancePolicy policy = policyRepository.findById(id)
                 .orElseThrow(() -> new PolicyNotFoundException(id));
 
