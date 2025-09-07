@@ -17,16 +17,19 @@ public class InsurancePolicyService {
 
     private final InsurancePolicyRepository policyRepository;
     private final CarRepository carRepository;
+    private final PolicyExpiryLogger policyExpiryLogger;
 
-    public InsurancePolicyService(InsurancePolicyRepository policyRepository, CarRepository carRepository) {
+    public InsurancePolicyService(InsurancePolicyRepository policyRepository, CarRepository carRepository, PolicyExpiryLogger policyExpiryLogger) {
         this.policyRepository = policyRepository;
         this.carRepository = carRepository;
+        this.policyExpiryLogger = policyExpiryLogger;
     }
 
     @Transactional
     public InsurancePolicyResponseDto createPolicy(InsurancePolicyDto policyDto) {
         Car car = carRepository.findById(policyDto.carId())
                 .orElseThrow(() -> new CarNotFoundException(policyDto.carId()));
+        // TODO validate date - startDate <= endDate
 
         InsurancePolicy policy = new InsurancePolicy(car, policyDto.provider(), policyDto.startDate(), policyDto.endDate());
 
@@ -52,11 +55,20 @@ public class InsurancePolicyService {
             policy.setCar(car);
         }
 
+        // TODO validate date - startDate <= endDate
+
+        boolean endDateChanged = !policy.getEndDate().equals(policyDto.endDate());
+
         policy.setProvider(policyDto.provider());
         policy.setStartDate(policyDto.startDate());
         policy.setEndDate(policyDto.endDate());
 
         policy = policyRepository.save(policy);
+
+        if(endDateChanged){
+            // remove policy ID from the list of logged policy IDs if the end date was changed
+            policyExpiryLogger.removeLoggedPolicyId(policy.getId());
+        }
 
 
         return new InsurancePolicyResponseDto(
